@@ -1,9 +1,10 @@
 // Schedule endpoints
 const express = require('express');
-const { getSchedules } = require('../controllers/scheduleController');
+const { getSchedules, getScheduleSeats } = require('../controllers/scheduleController');
 
 const router = express.Router();
 
-router.get('/', getSchedules); // Search available buses
+router.get('/', getSchedules);
+router.get('/:id/seats', getScheduleSeats);
 
 module.exports = router;

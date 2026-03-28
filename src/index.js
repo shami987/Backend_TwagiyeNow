@@ -10,6 +10,7 @@ const routeRoutes = require('./routes/routeRoutes');
 const scheduleRoutes = require('./routes/scheduleRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const busRoutes = require('./routes/busRoutes');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/routes', routeRoutes);
+app.use('/api/buses', busRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/admin', adminRoutes);

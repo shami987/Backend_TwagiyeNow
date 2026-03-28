@@ -7,7 +7,8 @@
     "dev": "nodemon src/index.js",
     "migrate": "node src/db/migrations/createUsersTable.js",
     "migrate:tables": "node src/db/migrations/createTables.js",
-    "migrate:admin": "node src/db/migrations/addAdminRole.js"
+    "migrate:admin": "node src/db/migrations/addAdminRole.js",
+    "migrate:resets": "node src/db/migrations/createPasswordResets.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

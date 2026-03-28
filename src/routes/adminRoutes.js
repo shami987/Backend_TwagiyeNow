@@ -1,17 +1,22 @@
-// Admin endpoints — protected by auth + admin middleware
 const express = require('express');
-const { addRoute, addBus, addSchedule, getBuses } = require('../controllers/adminController');
+const { addRoute, updateRoute, deleteRoute, addBus, getBuses, updateBus, deleteBus, addSchedule, updateSchedule, deleteSchedule } = require('../controllers/adminController');
 const authMiddleware = require('../middleware/authMiddleware');
 const adminMiddleware = require('../middleware/adminMiddleware');
 
 const router = express.Router();
-
-// Apply both middlewares to all admin routes
 router.use(authMiddleware, adminMiddleware);
 
-router.post('/routes', addRoute);       // Add a route
-router.post('/buses', addBus);          // Add a bus
-router.get('/buses', getBuses);         // List all buses
-router.post('/schedules', addSchedule); // Add a schedule
+router.post('/routes', addRoute);
+router.put('/routes/:id', updateRoute);
+router.delete('/routes/:id', deleteRoute);
+
+router.get('/buses', getBuses);
+router.post('/buses', addBus);
+router.put('/buses/:id', updateBus);
+router.delete('/buses/:id', deleteBus);
+
+router.post('/schedules', addSchedule);
+router.put('/schedules/:id', updateSchedule);
+router.delete('/schedules/:id', deleteSchedule);
 
 module.exports = router;

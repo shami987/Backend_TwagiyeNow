@@ -1,9 +1,10 @@
 // Routes endpoints
 const express = require('express');
-const { getRoutes } = require('../controllers/routeController');
+const { getRoutes, getRouteById } = require('../controllers/routeController');
 
 const router = express.Router();
 
-router.get('/', getRoutes); // List all routes
+router.get('/', getRoutes);
+router.get('/:id', getRouteById);
 
 module.exports = router;
