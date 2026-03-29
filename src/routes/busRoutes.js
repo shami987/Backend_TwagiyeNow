@@ -1,26 +1,14 @@
+// Bus endpoints
 const express = require('express');
-const pool = require('../db');
+const { getAllBuses, getBusById, getBusSeats, getBusSchedule, getBusLocation, updateBusLocation } = require('../controllers/busLocationController');
+
 const router = express.Router();
 
-// GET /api/buses — public bus listings
-router.get('/', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM buses ORDER BY name');
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// GET /api/buses/:id — single bus detail
-router.get('/:id', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM buses WHERE id = $1', [req.params.id]);
-    if (result.rows.length === 0) return res.status(404).json({ message: 'Bus not found' });
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+router.get('/', getAllBuses);                    // List all buses
+router.get('/:id', getBusById);                 // Get a single bus
+router.get('/:id/seats', getBusSeats);          // Real-time seat availability
+router.get('/:id/schedule', getBusSchedule);    // Departure and arrival schedule
+router.get('/:id/location', getBusLocation);    // Get bus GPS location
+router.put('/:id/location', updateBusLocation); // Update bus GPS location
 
 module.exports = router;

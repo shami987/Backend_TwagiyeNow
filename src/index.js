@@ -11,6 +11,7 @@ const scheduleRoutes = require('./routes/scheduleRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const busRoutes = require('./routes/busRoutes');
+const privateCarRoutes = require('./routes/privateCarRoutes');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/buses', busRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/private-cars', privateCarRoutes);
 
 // Swagger docs — available at /api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
