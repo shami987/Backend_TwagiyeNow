@@ -9,7 +9,6 @@ const authRoutes = require('./routes/authRoutes');
 const routeRoutes = require('./routes/routeRoutes');
 const scheduleRoutes = require('./routes/scheduleRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
-const adminRoutes = require('./routes/adminRoutes');
 const busRoutes = require('./routes/busRoutes');
 const privateCarRoutes = require('./routes/privateCarRoutes');
 
@@ -25,7 +24,6 @@ app.use('/api/routes', routeRoutes);
 app.use('/api/buses', busRoutes);
 app.use('/api/schedules', scheduleRoutes);
 app.use('/api/bookings', bookingRoutes);
-app.use('/api/admin', adminRoutes);
 app.use('/api/private-cars', privateCarRoutes);
 
 // Swagger docs — available at /api-docs

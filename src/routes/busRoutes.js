@@ -1,14 +1,20 @@
 // Bus endpoints
 const express = require('express');
 const { getAllBuses, getBusById, getBusSeats, getBusSchedule, getBusLocation, updateBusLocation } = require('../controllers/busLocationController');
+const { addBus, updateBus, deleteBus } = require('../controllers/adminController');
+const authMiddleware = require('../middleware/authMiddleware');
+const adminMiddleware = require('../middleware/adminMiddleware');
 
 const router = express.Router();
 
-router.get('/', getAllBuses);                    // List all buses
-router.get('/:id', getBusById);                 // Get a single bus
-router.get('/:id/seats', getBusSeats);          // Real-time seat availability
-router.get('/:id/schedule', getBusSchedule);    // Departure and arrival schedule
-router.get('/:id/location', getBusLocation);    // Get bus GPS location
-router.put('/:id/location', updateBusLocation); // Update bus GPS location
+router.get('/', getAllBuses);
+router.post('/', authMiddleware, adminMiddleware, addBus);
+router.get('/:id', getBusById);
+router.put('/:id', authMiddleware, adminMiddleware, updateBus);
+router.delete('/:id', authMiddleware, adminMiddleware, deleteBus);
+router.get('/:id/seats', getBusSeats);
+router.get('/:id/schedule', getBusSchedule);
+router.get('/:id/location', getBusLocation);
+router.put('/:id/location', updateBusLocation);
 
 module.exports = router;

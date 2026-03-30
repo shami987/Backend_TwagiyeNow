@@ -10,7 +10,9 @@
     "migrate:admin": "node src/db/migrations/addAdminRole.js",
     "migrate:locations": "node src/db/migrations/createLocationTables.js",
     "migrate:uuid": "node src/db/migrations/resetWithUUID.js",
-    "migrate:booking": "node src/db/migrations/addBookingColumns.js"
+    "migrate:booking": "node src/db/migrations/addBookingColumns.js",
+    "seed": "node src/db/seed.js",
+    "seed": "node src/db/seed.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
