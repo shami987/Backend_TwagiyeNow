@@ -101,4 +101,25 @@ const deleteSchedule = async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
-module.exports = { addRoute, updateRoute, deleteRoute, addBus, getBuses, updateBus, deleteBus, addSchedule, updateSchedule, deleteSchedule };
+// Add a private car
+const addPrivateCar = async (req, res) => {
+  const { driver_name, plate, car_model, capacity, price_per_km } = req.body;
+  try {
+    const result = await pool.query(
+      'INSERT INTO private_cars (driver_name, plate, car_model, capacity, price_per_km) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [driver_name, plate, car_model, capacity, price_per_km]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+// Delete a private car
+const deletePrivateCar = async (req, res) => {
+  try {
+    const result = await pool.query('DELETE FROM private_cars WHERE id=$1 RETURNING id', [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ message: 'Car not found' });
+    res.json({ message: 'Car deleted' });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+module.exports = { addRoute, updateRoute, deleteRoute, addBus, getBuses, updateBus, deleteBus, addSchedule, updateSchedule, deleteSchedule, addPrivateCar, deletePrivateCar };

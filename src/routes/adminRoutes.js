@@ -1,5 +1,5 @@
 const express = require('express');
-const { addRoute, updateRoute, deleteRoute, addBus, getBuses, updateBus, deleteBus, addSchedule, updateSchedule, deleteSchedule } = require('../controllers/adminController');
+const { addRoute, updateRoute, deleteRoute, addBus, getBuses, updateBus, deleteBus, addSchedule, updateSchedule, deleteSchedule, addPrivateCar, deletePrivateCar } = require('../controllers/adminController');
 const authMiddleware = require('../middleware/authMiddleware');
 const adminMiddleware = require('../middleware/adminMiddleware');
 
@@ -18,5 +18,8 @@ router.delete('/buses/:id', deleteBus);
 router.post('/schedules', addSchedule);
 router.put('/schedules/:id', updateSchedule);
 router.delete('/schedules/:id', deleteSchedule);
+
+router.post('/private-cars', addPrivateCar);      // Add a private car
+router.delete('/private-cars/:id', deletePrivateCar); // Delete a private car
 
 module.exports = router;
