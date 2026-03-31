@@ -1,12 +1,46 @@
 // Handles schedule search
 const pool = require('../db');
 
+// GET /api/schedules/all?date= — get all schedules for a date
+const getAllSchedules = async (req, res) => {
+  const { date } = req.query;
+  try {
+    const query = date
+      ? `SELECT s.id, s.route_id, s.bus_id, s.departure_time, s.expected_arrival, s.price,
+                r.from_city, r.to_city, r.distance_km,
+                b.name AS bus_name, b.plate, b.capacity,
+                b.capacity - COUNT(bk.id) AS available_seats
+         FROM schedules s
+         JOIN routes r ON s.route_id = r.id
+         JOIN buses b ON s.bus_id = b.id
+         LEFT JOIN bookings bk ON bk.schedule_id = s.id
+         WHERE DATE(s.departure_time) = $1
+         GROUP BY s.id, r.id, b.id
+         ORDER BY s.departure_time`
+      : `SELECT s.id, s.route_id, s.bus_id, s.departure_time, s.expected_arrival, s.price,
+                r.from_city, r.to_city, r.distance_km,
+                b.name AS bus_name, b.plate, b.capacity,
+                b.capacity - COUNT(bk.id) AS available_seats
+         FROM schedules s
+         JOIN routes r ON s.route_id = r.id
+         JOIN buses b ON s.bus_id = b.id
+         LEFT JOIN bookings bk ON bk.schedule_id = s.id
+         GROUP BY s.id, r.id, b.id
+         ORDER BY s.departure_time`;
+
+    const result = await pool.query(query, date ? [date] : []);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // GET /api/schedules?from=&to=&date= — search available buses
 const getSchedules = async (req, res) => {
   const { from, to, date } = req.query;
   try {
     const result = await pool.query(
-      `SELECT s.id, s.departure_time, s.price,
+      `SELECT s.id, s.departure_time, s.expected_arrival, s.price,
               r.from_city, r.to_city, r.distance_km,
               b.name AS bus_name, b.plate, b.capacity,
               b.capacity - COUNT(bk.id) AS available_seats
@@ -56,4 +90,4 @@ const getScheduleSeats = async (req, res) => {
   }
 };
 
-module.exports = { getSchedules, getScheduleSeats };
+module.exports = { getSchedules, getScheduleSeats, getAllSchedules };
