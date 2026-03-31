@@ -37,22 +37,32 @@ const seed = async () => {
     `);
     console.log('✅ Buses seeded:', buses.rows.map(b => b.name).join(', '));
 
-    // Schedules — use returned IDs
+    // Schedules — use returned IDs with dynamic future dates
     const r = routes.rows;
     const b = buses.rows;
-    // Use a fixed future date in 2026
-    const d = '2026-03-31';
+
+    const futureDate = (daysAhead: number, hour: number) => {
+      const d = new Date();
+      d.setDate(d.getDate() + daysAhead);
+      d.setHours(hour, 0, 0, 0);
+      return d.toISOString();
+    };
 
     await pool.query(`
       INSERT INTO schedules (route_id, bus_id, departure_time, price) VALUES
-        ($1, $6,  '${d} 06:00:00', 2500),
-        ($1, $7,  '${d} 10:00:00', 2500),
-        ($2, $8,  '${d} 07:00:00', 3000),
-        ($3, $9,  '${d} 08:00:00', 3500),
-        ($4, $10, '${d} 09:00:00', 4000),
-        ($5, $6,  '${d} 11:00:00', 5000);
-    `, [r[0].id, r[1].id, r[2].id, r[3].id, r[4].id, b[0].id, b[1].id, b[2].id, b[3].id, b[4].id]);
-    console.log(`✅ Schedules seeded for ${d}`);
+        ($1, $6,  $11, 2500),
+        ($1, $7,  $12, 2500),
+        ($2, $8,  $13, 3000),
+        ($3, $9,  $14, 3500),
+        ($4, $10, $15, 4000),
+        ($5, $6,  $16, 5000);
+    `, [
+      r[0].id, r[1].id, r[2].id, r[3].id, r[4].id,
+      b[0].id, b[1].id, b[2].id, b[3].id, b[4].id,
+      futureDate(1, 6), futureDate(1, 10), futureDate(1, 7),
+      futureDate(2, 8), futureDate(2, 9),  futureDate(3, 11),
+    ]);
+    console.log('✅ Schedules seeded with future dates');
 
     // Private cars
     await pool.query(`

@@ -72,6 +72,36 @@ router.get('/bookings', async (req, res) => {
   }
 });
 
+// GET /api/admin/verify-qr/:qr_code — verify a passenger QR code
+router.get('/verify-qr/:qr_code', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT bk.id, bk.seat_number, bk.status, bk.payment_status, bk.qr_code, bk.created_at,
+             u.name AS passenger_name, u.email,
+             s.departure_time, s.price,
+             r.from_city, r.to_city,
+             b.name AS bus_name, b.plate
+      FROM bookings bk
+      JOIN users u ON bk.user_id = u.id
+      JOIN schedules s ON bk.schedule_id = s.id
+      JOIN routes r ON s.route_id = r.id
+      JOIN buses b ON s.bus_id = b.id
+      WHERE bk.qr_code = $1
+    `, [req.params.qr_code]);
+
+    if (result.rows.length === 0)
+      return res.status(404).json({ valid: false, message: 'Invalid QR code' });
+
+    const booking = result.rows[0];
+    if (booking.status === 'cancelled')
+      return res.status(400).json({ valid: false, message: 'Ticket has been cancelled', booking });
+
+    res.json({ valid: true, message: 'Valid ticket', booking });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // GET /api/admin/companies
 router.get('/companies', async (req, res) => {
   try {

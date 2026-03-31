@@ -51,9 +51,8 @@ const getSchedules = async (req, res) => {
        WHERE r.from_city ILIKE $1
          AND r.to_city ILIKE $2
          AND DATE(s.departure_time) = $3
-         AND s.departure_time > NOW()
+         AND (DATE($3) > CURRENT_DATE OR s.departure_time > NOW())
        GROUP BY s.id, r.id, b.id
-       HAVING b.capacity - COUNT(bk.id) > 0
        ORDER BY s.departure_time`,
       [from, to, date]
     );
