@@ -40,16 +40,19 @@ const seed = async () => {
     // Schedules — use returned IDs
     const r = routes.rows;
     const b = buses.rows;
+    // Use a fixed future date in 2026
+    const d = '2026-03-31';
+
     await pool.query(`
       INSERT INTO schedules (route_id, bus_id, departure_time, price) VALUES
-        ($1, $6,  '2025-05-01 06:00:00', 2500),
-        ($1, $7,  '2025-05-01 10:00:00', 2500),
-        ($2, $8,  '2025-05-01 07:00:00', 3000),
-        ($3, $9,  '2025-05-01 08:00:00', 3500),
-        ($4, $10, '2025-05-01 09:00:00', 4000),
-        ($5, $6,  '2025-05-01 11:00:00', 5000);
+        ($1, $6,  '${d} 06:00:00', 2500),
+        ($1, $7,  '${d} 10:00:00', 2500),
+        ($2, $8,  '${d} 07:00:00', 3000),
+        ($3, $9,  '${d} 08:00:00', 3500),
+        ($4, $10, '${d} 09:00:00', 4000),
+        ($5, $6,  '${d} 11:00:00', 5000);
     `, [r[0].id, r[1].id, r[2].id, r[3].id, r[4].id, b[0].id, b[1].id, b[2].id, b[3].id, b[4].id]);
-    console.log('✅ Schedules seeded');
+    console.log(`✅ Schedules seeded for ${d}`);
 
     // Private cars
     await pool.query(`

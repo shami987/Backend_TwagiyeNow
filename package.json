@@ -11,7 +11,7 @@
     "migrate:locations": "node src/db/migrations/createLocationTables.js",
     "migrate:uuid": "node src/db/migrations/resetWithUUID.js",
     "migrate:booking": "node src/db/migrations/addBookingColumns.js",
-    "seed": "node src/db/seed.js",
+    "migrate:carbookings": "node src/db/migrations/createPrivateCarBookings.js",
     "seed": "node src/db/seed.js"
   },
   "dependencies": {
