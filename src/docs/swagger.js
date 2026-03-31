@@ -320,6 +320,34 @@ const options = {
           responses: { 201: { description: 'Car added' }, 403: { description: 'Admins only' } },
         },
       },
+      '/api/private-cars/book': {
+        post: {
+          tags: ['Private Cars'], summary: 'Book a private car', security: [{ bearerAuth: [] }],
+          requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['car_id','pickup_location','dropoff_location','pickup_time','distance_km'], properties: { car_id: { type: 'string', format: 'uuid', example: UUID_EXAMPLE }, pickup_location: { type: 'string', example: 'Kigali City Center' }, dropoff_location: { type: 'string', example: 'Kigali Airport' }, pickup_time: { type: 'string', example: '2026-03-31T08:00:00Z' }, distance_km: { type: 'number', example: 15 } } } } } },
+          responses: { 201: { description: 'Car booked' }, 404: { description: 'Car not available' } },
+        },
+      },
+      '/api/private-cars/book/{id}/pay': {
+        post: {
+          tags: ['Private Cars'], summary: 'Pay for a private car booking', security: [{ bearerAuth: [] }],
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['payment_method'], properties: { payment_method: { type: 'string', enum: ['momo', 'airtel'], example: 'momo' } } } } } },
+          responses: { 200: { description: 'Payment confirmed' }, 400: { description: 'Already paid' } },
+        },
+      },
+      '/api/private-cars/my-bookings': {
+        get: {
+          tags: ['Private Cars'], summary: 'Get my private car bookings', security: [{ bearerAuth: [] }],
+          responses: { 200: { description: 'List of my car bookings' } },
+        },
+      },
+      '/api/private-cars/book/{id}/cancel': {
+        put: {
+          tags: ['Private Cars'], summary: 'Cancel a private car booking', security: [{ bearerAuth: [] }],
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: { 200: { description: 'Booking cancelled' }, 404: { description: 'Not found' } },
+        },
+      },
       '/api/private-cars/{id}': {
         delete: {
           tags: ['Private Cars'], summary: 'Delete a private car [Admin]', security: [{ bearerAuth: [] }],

@@ -71,22 +71,22 @@ const deleteBus = async (req, res) => {
 };
 
 const addSchedule = async (req, res) => {
-  const { route_id, bus_id, departure_time, price } = req.body;
+  const { route_id, bus_id, departure_time, price, expected_arrival } = req.body;
   try {
     const result = await pool.query(
-      'INSERT INTO schedules (route_id, bus_id, departure_time, price) VALUES ($1, $2, $3, $4) RETURNING *',
-      [route_id, bus_id, departure_time, price]
+      'INSERT INTO schedules (route_id, bus_id, departure_time, price, expected_arrival) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [route_id, bus_id, departure_time, price, expected_arrival || null]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
 const updateSchedule = async (req, res) => {
-  const { route_id, bus_id, departure_time, price } = req.body;
+  const { route_id, bus_id, departure_time, price, expected_arrival } = req.body;
   try {
     const result = await pool.query(
-      'UPDATE schedules SET route_id=$1, bus_id=$2, departure_time=$3, price=$4 WHERE id=$5 RETURNING *',
-      [route_id, bus_id, departure_time, price, req.params.id]
+      'UPDATE schedules SET route_id=$1, bus_id=$2, departure_time=$3, price=$4, expected_arrival=$5 WHERE id=$6 RETURNING *',
+      [route_id, bus_id, departure_time, price, expected_arrival || null, req.params.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ message: 'Schedule not found' });
     res.json(result.rows[0]);
