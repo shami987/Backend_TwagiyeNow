@@ -11,13 +11,11 @@
     "migrate:locations": "node src/db/migrations/createLocationTables.js",
     "migrate:uuid": "node src/db/migrations/resetWithUUID.js",
     "migrate:booking": "node src/db/migrations/addBookingColumns.js",
-    "migrate:carbookings": "node src/db/migrations/createPrivateCarBookings.js",
-    "migrate:companies": "node src/db/migrations/createCompaniesTable.js",
-    "migrate:arrival": "node src/db/migrations/addExpectedArrival.js",
     "seed": "node src/db/seed.js"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
+    "@google/genai": "^1.47.0",
+    "axios": "^1.14.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
