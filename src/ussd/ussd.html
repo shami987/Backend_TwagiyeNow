@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TwagiyeNow USSD Simulator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0d0d1a; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+
+    .phone {
+      width: 340px;
+      background: #111;
+      border-radius: 40px;
+      padding: 20px;
+      box-shadow: 0 0 60px rgba(74, 222, 128, 0.15), 0 0 0 2px #1e1e3a;
+    }
+
+    .phone-top {
+      display: flex; justify-content: center; margin-bottom: 16px;
+    }
+    .notch { width: 80px; height: 8px; background: #1e1e3a; border-radius: 4px; }
+
+    .screen {
+      background: #0a0a15;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid #1e1e3a;
+      margin-bottom: 16px;
+    }
+
+    .screen-header {
+      background: #111128;
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid #1e1e3a;
+    }
+    .screen-header span { color: #4ade80; font-size: 11px; letter-spacing: 2px; }
+
+    .dial-display {
+      background: #0d0d1a;
+      padding: 12px 16px;
+      border-bottom: 1px solid #1e1e3a;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .dial-display span { color: #4ade80; font-size: 13px; font-weight: bold; }
+    .signal { display: flex; gap: 2px; align-items: flex-end; }
+    .signal div { background: #4ade80; width: 3px; border-radius: 1px; }
+
+    .messages { padding: 14px; min-height: 280px; max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .messages::-webkit-scrollbar { width: 4px; }
+    .messages::-webkit-scrollbar-thumb { background: #1e1e3a; border-radius: 2px; }
+
+    .msg-system {
+      background: #111128;
+      border-left: 3px solid #4ade80;
+      border-radius: 0 12px 12px 0;
+      padding: 12px;
+      color: #e2e8f0;
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    .msg-system.end { border-left-color: #f59e0b; }
+    .msg-system .end-badge { display: inline-block; background: #f59e0b20; color: #f59e0b; font-size: 9px; padding: 2px 6px; border-radius: 4px; margin-top: 6px; }
+
+    .msg-user {
+      align-self: flex-end;
+      background: #4ade8015;
+      border: 1px solid #4ade8030;
+      border-radius: 12px;
+      padding: 8px 14px;
+      color: #4ade80;
+      font-size: 13px;
+    }
+
+    .loading { display: flex; gap: 4px; padding: 12px; }
+    .dot { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; animation: bounce 0.8s infinite; }
+    .dot:nth-child(2) { animation-delay: 0.15s; }
+    .dot:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bounce { 0%,80%,100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+
+    .input-area {
+      background: #111128;
+      border-top: 1px solid #1e1e3a;
+      padding: 12px;
+    }
+    .input-row { display: flex; gap: 8px; }
+    .input-row input {
+      flex: 1; background: #0a0a15; color: #4ade80; border: 1px solid #1e1e3a;
+      border-radius: 10px; padding: 10px 14px; font-family: 'Courier New', monospace;
+      font-size: 14px; outline: none;
+    }
+    .input-row input:focus { border-color: #4ade8060; }
+    .input-row input::placeholder { color: #333; }
+    .send-btn {
+      background: #4ade80; color: #0a0a15; border: none; border-radius: 10px;
+      padding: 10px 16px; font-family: 'Courier New', monospace; font-weight: bold;
+      font-size: 13px; cursor: pointer; transition: opacity 0.2s;
+    }
+    .send-btn:hover { opacity: 0.85; }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .restart-btn {
+      width: 100%; background: #4ade80; color: #0a0a15; border: none; border-radius: 12px;
+      padding: 14px; font-family: 'Courier New', monospace; font-weight: bold;
+      font-size: 13px; cursor: pointer;
+    }
+
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+    .key {
+      background: #1a1a2e; color: #e2e8f0; border: 1px solid #1e1e3a; border-radius: 12px;
+      padding: 12px; text-align: center; cursor: pointer; font-family: 'Courier New', monospace;
+      font-size: 16px; font-weight: bold; transition: background 0.15s;
+    }
+    .key:hover { background: #252540; }
+    .key:active { background: #4ade8020; }
+    .key.special { color: #4ade80; }
+
+    .title { text-align: center; color: #4ade80; font-size: 12px; margin-bottom: 16px; letter-spacing: 1px; }
+  </style>
+</head>
+<body>
+  <div>
+    <p class="title">▶ TwagiyeNow USSD Simulator — *384#</p>
+    <div class="phone">
+      <div class="phone-top"><div class="notch"></div></div>
+
+      <div class="screen">
+        <div class="screen-header"><span>TWAGIYENOW USSD</span></div>
+        <div class="dial-display">
+          <div class="signal">
+            <div style="height:4px"></div><div style="height:7px"></div>
+            <div style="height:10px"></div><div style="height:13px"></div>
+          </div>
+          <span>*384# TwagiyeNow</span>
+        </div>
+        <div class="messages" id="messages"></div>
+        <div class="input-area" id="inputArea">
+          <div class="input-row">
+            <input type="text" id="userInput" placeholder="Enter option..." autocomplete="off" />
+            <button class="send-btn" id="sendBtn" onclick="send()">SEND</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="keypad">
+        <div class="key" onclick="appendKey('1')">1</div>
+        <div class="key" onclick="appendKey('2')">2</div>
+        <div class="key" onclick="appendKey('3')">3</div>
+        <div class="key" onclick="appendKey('4')">4</div>
+        <div class="key" onclick="appendKey('5')">5</div>
+        <div class="key" onclick="appendKey('6')">6</div>
+        <div class="key" onclick="appendKey('7')">7</div>
+        <div class="key" onclick="appendKey('8')">8</div>
+        <div class="key" onclick="appendKey('9')">9</div>
+        <div class="key special" onclick="appendKey('*')">*</div>
+        <div class="key" onclick="appendKey('0')">0</div>
+        <div class="key special" onclick="appendKey('-')">-</div>
+        <div class="key special" onclick="clearInput()">⌫</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
+    let ended = false;
+
+    function appendKey(val) {
+      if (ended) return;
+      document.getElementById('userInput').value += val;
+    }
+
+    function clearInput() {
+      const inp = document.getElementById('userInput');
+      inp.value = inp.value.slice(0, -1);
+    }
+
+    function addMessage(text, type) {
+      const msgs = document.getElementById('messages');
+      const div = document.createElement('div');
+      const isEnd = text.startsWith('END ');
+      const clean = text.replace(/^(CON|END)\s/, '');
+      if (type === 'system') {
+        div.className = 'msg-system' + (isEnd ? ' end' : '');
+        div.textContent = clean;
+        if (isEnd) {
+          const badge = document.createElement('div');
+          badge.className = 'end-badge';
+          badge.textContent = 'SESSION ENDED';
+          div.appendChild(badge);
+        }
+      } else {
+        div.className = 'msg-user';
+        div.textContent = text;
+      }
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+      return isEnd;
+    }
+
+    function showLoading() {
+      const msgs = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.className = 'loading'; div.id = 'loading';
+      div.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function hideLoading() {
+      const el = document.getElementById('loading');
+      if (el) el.remove();
+    }
+
+    function showRestart() {
+      const area = document.getElementById('inputArea');
+      area.innerHTML = '<button class="restart-btn" onclick="restart()">🔄 START NEW SESSION</button>';
+    }
+
+    async function send() {
+      if (ended) return;
+      const input = document.getElementById('userInput').value.trim();
+      document.getElementById('userInput').value = '';
+      if (input !== '') addMessage(input, 'user');
+      document.getElementById('sendBtn').disabled = true;
+      showLoading();
+      try {
+        const res = await fetch('/ussd/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId, input })
+        });
+        const data = await res.json();
+        hideLoading();
+        const isEnd = addMessage(data.response, 'system');
+        if (isEnd) { ended = true; showRestart(); }
+        else document.getElementById('sendBtn').disabled = false;
+      } catch (e) {
+        hideLoading();
+        addMessage('END Connection error. Is the server running?', 'system');
+        ended = true; showRestart();
+      }
+    }
+
+    function restart() {
+      ended = false;
+      document.getElementById('messages').innerHTML = '';
+      document.getElementById('inputArea').innerHTML = `
+        <div class="input-row">
+          <input type="text" id="userInput" placeholder="Enter option..." autocomplete="off" />
+          <button class="send-btn" id="sendBtn" onclick="send()">SEND</button>
+        </div>`;
+      document.getElementById('userInput').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+      fetch('/ussd/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId }) });
+      send();
+    }
+
+    // Enter key support
+    document.getElementById('userInput').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+
+    // Auto-start session
+    send();
+  </script>
+</body>
+</html>
